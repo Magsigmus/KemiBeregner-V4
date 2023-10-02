@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using 
+using System.Numerics;
 
 namespace Chemistry
 {
@@ -36,7 +36,7 @@ namespace Chemistry
         public static string BalenceChemicalEqation(string input)
         {
             // Gets the compounds and chemical matrix
-            string[] compounds; Matrix chemicalMatrix = MakeChemicalMatrix(input, out compounds);
+            string[] compounds; Matrix<BigRational> chemicalMatrix = MakeChemicalMatrix(input, out compounds);
 
             // gets the reduced echelon form
             chemicalMatrix = chemicalMatrix.reducedEchelonForm;
@@ -58,15 +58,15 @@ namespace Chemistry
             if (nullity == 0) { return "Ingen løsning"; }
 
             // Modifices the matrix
-            Matrix partMatrix1 = new Matrix(chemicalMatrix.xLength - nullity, nullity);
-            partMatrix1.AppendMatrix(Matrix.CreateAnIdentityMatrix(nullity), false);
+            Matrix<BigRational> partMatrix1 = new Matrix<BigRational>(chemicalMatrix.xLength - nullity, nullity);
+            partMatrix1.AppendMatrix(Matrix<BigRational>.CreateAnIdentityMatrix(nullity), false);
             chemicalMatrix.AppendMatrix(partMatrix1);
 
             // Gets the inverse of the matrix
             chemicalMatrix = chemicalMatrix.inverse;
 
             // Gets the raw solution
-            double[] rawSolution = chemicalMatrix.GetColum(chemicalMatrix.xLength - 1).ReduceToArray();
+            BigRational[] rawSolution = chemicalMatrix.GetColum(chemicalMatrix.xLength - 1).ReduceToArray();
 
             // Converts that to ints
             int[] solution = RawSolutionToInt(rawSolution);
@@ -86,14 +86,14 @@ namespace Chemistry
         /// <param name="input">The chemical equation as a string</param>
         /// <param name="compounds">The compounds in the equation</param>
         /// <returns>The chemical matrix as a linear algebra matrix</returns>
-        public static Matrix MakeChemicalMatrix(string input, out string[] compounds)
+        public static Matrix<BigRational> MakeChemicalMatrix(string input, out string[] compounds)
         {
             // Gets all the chemical compounds and elements in the reaktionsskema
             compounds = GetAllCompoundsInEquation(input);
             string[] elements = FindAllElements(input);
             ChemicalCompound[] compundInfos = compounds.Select(e => ParseChemcialCompound(e)).ToArray();
 
-            Matrix chemicalMatrix = new Matrix(compundInfos.Length, elements.Length);
+            Matrix<BigRational> chemicalMatrix = new Matrix<BigRational>(compundInfos.Length, elements.Length);
 
             // Goes through every column
             for (int i = 0; i < compundInfos.Length; i++)
@@ -124,22 +124,33 @@ namespace Chemistry
              return string.Join("", input.Split(' ')).Split("→").Select(element => element.Split('+')).SelectMany(inner => inner).ToArray();
         }
 
-        private static int[] RawSolutionToInt(double[] solution)
+        private static int[] RawSolutionToInt(BigRational[] solution)
         {
-            // Converts the raw solution to a workable decimal
-            double min = solution.Select(element => Math.Abs(element)).Min();
-            solution = solution.Select(element => Math.Round(element / min, 5)).ToArray();
+            // Converts the rationals to integeres, while preserving the ratio between the coefficents
+            for(int i = 0; i < solution.Length; i++) 
+            {
+                BigRational.Integer denominator;
+                BigRational.NumDen(solution[i], out denominator);
 
-            // Converts the decimals to a integer
-            int maxDecimalPoints = solution.Select(e => (e.ToString().IndexOf(',') != -1) ? e.ToString().Length - e.ToString().IndexOf(',') - 1 : 0).Max();
-            solution = solution.Select(element => element * Math.Pow(10, maxDecimalPoints)).ToArray();
+                if(denominator == 1) { continue; }
 
-            // Finds the greatest common divisor
-            int gcd = GCD((int)solution[0], (int)solution[1]);
-            for (int i = 2; i < solution.Length; i++) { gcd = GCD((int)solution[i], gcd); }
+                for(int j = 0; i < solution.Length; j++)
+                {
+                    solution[j] *= denominator;
+                }
+            }
 
-            // Divies with the greatest  common divisor
-            solution = solution.Select(element => Math.Round(element / gcd, 5)).ToArray();
+            // Makes the coefficents co-prime
+            int gcd = 1;
+            do
+            {
+                // Finds the greatest common divisor
+                gcd = GCD((int)solution[0], (int)solution[1]);
+                for (int i = 2; i < solution.Length; i++) { gcd = GCD((int)solution[i], gcd); }
+
+                // Divies with the greatest common divisor
+                solution = solution.Select(element => element / gcd).ToArray();
+            } while (gcd != 1);
 
             return solution.Select(e => (int)e).ToArray();
         }
