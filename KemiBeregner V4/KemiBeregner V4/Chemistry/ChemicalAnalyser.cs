@@ -46,10 +46,10 @@ namespace Chemistry
             MessageBox.Show("Reduced Row-Echelon Form:\n" + chemicalMatrix.WriteMatrix());
 
             // Removes every row that contains only zeros
-            for (int i = 0; i < chemicalMatrix.yLength; i++)
+            for (int i = 0; i < chemicalMatrix.rowNumber; i++)
             {
                 bool allZeros = true;
-                for (int j = 0; j < chemicalMatrix.xLength; j++)
+                for (int j = 0; j < chemicalMatrix.ColumnNumber; j++)
                 {
                     if (chemicalMatrix[j, i] != 0) { allZeros = false; break; }
                 }
@@ -62,7 +62,7 @@ namespace Chemistry
             if (nullity == 0) { return "Ingen løsning"; }
 
             // Modifices the matrix
-            Matrix<BigRational> partMatrix1 = new Matrix<BigRational>(chemicalMatrix.xLength - nullity, nullity);
+            Matrix<BigRational> partMatrix1 = new Matrix<BigRational>(chemicalMatrix.ColumnNumber - nullity, nullity);
             partMatrix1.AppendMatrix(Matrix<BigRational>.CreateAnIdentityMatrix(nullity), false);
             chemicalMatrix.AppendMatrix(partMatrix1);
 
@@ -70,7 +70,7 @@ namespace Chemistry
             chemicalMatrix = chemicalMatrix.inverse;
 
             // Gets the raw solution
-            BigRational[] rawSolution = chemicalMatrix.GetColum(chemicalMatrix.xLength - 1).ReduceToArray();
+            BigRational[] rawSolution = chemicalMatrix.GetColum(chemicalMatrix.ColumnNumber - 1).ReduceToArray();
 
             // Converts that to ints
             int[] solution = RawSolutionToInt(rawSolution);
