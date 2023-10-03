@@ -38,9 +38,13 @@ namespace Chemistry
             // Gets the compounds and chemical matrix
             string[] compounds; Matrix<BigRational> chemicalMatrix = MakeChemicalMatrix(input, out compounds);
 
+            MessageBox.Show("Chemical Matrix:\n" + chemicalMatrix.WriteMatrix());
+
             // gets the reduced echelon form
             chemicalMatrix = chemicalMatrix.reducedEchelonForm;
-            
+
+            MessageBox.Show("Reduced Row-Echelon Form:\n" + chemicalMatrix.WriteMatrix());
+
             // Removes every row that contains only zeros
             for (int i = 0; i < chemicalMatrix.yLength; i++)
             {
@@ -205,7 +209,7 @@ namespace Chemistry
                 {
                     proposal += input[i];
                 }
-                else if (IsSubscript(input[i])) // Check for charge
+                else if (IsSuperscript(input[i])) // Check for charge
                 {
                     usesCharge = true;
                 }

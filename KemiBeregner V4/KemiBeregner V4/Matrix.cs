@@ -9,6 +9,7 @@ namespace LinearAlgebra
     class Matrix<T> : ICloneable
         where T : INumber<T>
     {
+        #region properties
         /// <summary>
         /// The raw matrix with all values
         /// </summary>
@@ -55,7 +56,14 @@ namespace LinearAlgebra
         /// <param name="indexX">The x-value of the value</param>
         /// <param name="indexY">The y-value of the value</param>
         public T this[int indexX, int indexY] { get { return matrix[indexY, indexX]; } set { matrix[indexY, indexX] = value; } }
-        
+        #endregion
+
+        #region constructors
+        /// <summary>
+        /// Makes a 0 by 0 matrix
+        /// </summary>
+        public Matrix() { MakeNewMatrix(0, 0); }
+
         /// <summary>
         /// Initializes the matrix with a 2D array 
         /// </summary>
@@ -100,6 +108,20 @@ namespace LinearAlgebra
         {
             MakeNewMatrix(initXLength, initYLength);
         }
+        #endregion
+
+        #region ultility functions
+
+        /// <summary>
+        /// Makes a new matrix and saves it 
+        /// </summary>
+        /// <param name="initXLength">The length in the x-axis</param>
+        /// <param name="initYLength">The length in the y-axis</param>
+        private void MakeNewMatrix(int initXLength, int initYLength)
+        {
+            T[,] newMatrix = new T[initYLength,initXLength];
+            matrix = newMatrix;
+        }
 
         /// <summary>
         /// Makes an identity matrix
@@ -114,21 +136,73 @@ namespace LinearAlgebra
         }
 
         /// <summary>
-        /// Makes a 0 by 0 matrix
+        /// Writes the matrix out
         /// </summary>
-        public Matrix() { MakeNewMatrix(0, 0); }
-
-        /// <summary>
-        /// Makes a new matrix and saves it 
-        /// </summary>
-        /// <param name="initXLength">The length in the x-axis</param>
-        /// <param name="initYLength">The length in the y-axis</param>
-        private void MakeNewMatrix(int initXLength, int initYLength)
+        /// <param name="val">The string the matrix should the written to</param>
+        public string WriteMatrix()
         {
-            T[,] newMatrix = new T[initYLength,initXLength];
-            matrix = newMatrix;
+            string result = "";
+            for (int i = 0; i < yLength; i++)
+            {
+                for (int j = 0; j < xLength; j++)
+                {
+                    result += $"{matrix[i, j]}\t";
+                }
+                result += "\n";
+            }
+            return result;
         }
 
+        /// <summary>
+        /// Flips the matrix around its identity (the diagonal)
+        /// </summary>
+        public void FlipMatrixAroundIdentity()
+        {
+            T[,] result = new T[yLength, xLength];
+            for (int i = 0; i < yLength; i++)
+            {
+                for (int j = 0; j < xLength; j++)
+                {
+                    result[i, j] = matrix[j, i];
+                }
+            }
+            matrix = result;
+        }
+
+        // TODO: ADD ZERO-MATRIX
+
+
+
+        /// <summary>
+        /// Reduces the matrix to a 1D array
+        /// </summary>
+        /// <returns>The matrix as an array</returns>
+        public T[] ReduceToArray()
+        {
+            T[] result = new T[yLength * xLength];
+
+            for (int i = 0; i < yLength; i++)
+            {
+                for (int j = 0; j < xLength; j++)
+                {
+                    result[i * xLength + j] = this[j, i];
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Makes a deep copy of the matrix
+        /// </summary>
+        /// <returns>A deep copy of this matrix</returns>
+        public object Clone()
+        {
+            return new Matrix<T>((T[,])matrix.Clone());
+        }
+        #endregion
+
+        #region Read, Write and other manipulations of rows, columns and the matrix
         /// <summary>
         /// Gets a row with a ceritan index
         /// </summary>
@@ -324,41 +398,9 @@ namespace LinearAlgebra
 
             return result;
         }
+        #endregion
 
-        /// <summary>
-        /// Writes the matrix out
-        /// </summary>
-        /// <param name="val">The string the matrix should the written to</param>
-        public void WriteMatrix(out string val)
-        {
-            string result = "";
-            for (int i = 0; i < yLength; i++)
-            {
-                for (int j = 0; j < xLength; j++)
-                {
-                    result += $"{matrix[i, j]}\t";
-                }
-                result += "\n";
-            }
-            val = result;
-        }
-
-        /// <summary>
-        /// Flips the matrix around its identity (the diagonal)
-        /// </summary>
-        public void FlipMatrixAroundIdentity()
-        {
-            T[,] result = new T[yLength, xLength];
-            for (int i = 0; i < yLength; i++)
-            {
-                for (int j = 0; j < xLength; j++)
-                {
-                    result[i, j] = matrix[j, i];
-                }
-            }
-            matrix = result;
-        }
-
+        #region Arithmatic operators
         public static Matrix<T> operator *(Matrix<T> algMatrix, T val)
         {
             for (int i = 0; i < algMatrix.yLength; i++)
@@ -415,7 +457,10 @@ namespace LinearAlgebra
             return algMatrix1 + (algMatrix2 * -T.One);
         }
 
+        // TODO: ADD MATRIXMULTIPLICATION
+        #endregion
 
+        #region Matrix-specific attributes
         /// <summary>
         /// Finds the determinant of a matrix
         /// </summary>
@@ -518,6 +563,9 @@ namespace LinearAlgebra
         /// <returns>The reduced row echelon form as a matrix</returns>
         public Matrix<T> FindReducedRowEchelonForm(Matrix<T> input)
         {
+            int rows
+
+            /*
             int lead = 0;
             for (int r = 0; r < input.yLength; r++)
             {
@@ -554,7 +602,7 @@ namespace LinearAlgebra
             }
 
             return input;
-
+            */
             void SwapRows(int rowIndex1, int rowIndex2)
             {
                 Matrix<T> firstRow = input.GetRow(rowIndex1);
@@ -564,28 +612,6 @@ namespace LinearAlgebra
             }
         }
 
-        /// <summary>
-        /// Reduces the matrix to a 1D array
-        /// </summary>
-        /// <returns>The matrix as an array</returns>
-        public T[] ReduceToArray()
-        {
-            T[] result = new T[yLength * xLength];
-
-            for(int i = 0; i < yLength; i++)
-            {
-                for(int j = 0; j < xLength; j++)
-                {
-                    result[i * xLength + j] = this[j, i];
-                }
-            }
-
-            return result;
-        }
-
-        public object Clone()
-        {
-            return new Matrix<T>((T[,])matrix.Clone());
-        }
+        #endregion
     }
 }
