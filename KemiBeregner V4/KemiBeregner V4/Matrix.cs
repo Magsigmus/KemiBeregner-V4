@@ -557,7 +557,7 @@ namespace LinearAlgebra
                     {
                         Matrix<T> temp = input.SubMatrix(rank, rank, j, i);
                         determinant = temp.determinant;
-                        if (determinant == T.Zero)
+                        if (determinant != T.Zero)
                         {
                             breakout = false;
                         }
@@ -620,18 +620,13 @@ namespace LinearAlgebra
                     input.SwapRows(index, rowsCompleted);
                 }
 
-                MessageBox.Show(input.WriteMatrix());
-
                 input.ScaleRow(T.One / input[columnsCompleted, rowsCompleted], rowsCompleted);
 
-                MessageBox.Show(input.WriteMatrix());
-
-                for (int i = rowsCompleted + 1; i < input.rowNumber; i++)
+                for (int i = 0; i < input.rowNumber; i++)
                 {
+                    if (i == rowsCompleted) { continue; }
                     input.ScaleAndAddRow(-input[columnsCompleted, i], rowsCompleted, i);
                 }
-
-                MessageBox.Show(input.WriteMatrix());
 
                 rowsCompleted++;
                 columnsCompleted++;
@@ -653,9 +648,9 @@ namespace LinearAlgebra
             T GenericSum(T[] values) 
             {
                 T sum = T.Zero;
-                foreach(T value in values)
+                for(int i = rowsCompleted; i < values.Length; i++)
                 {
-                    sum += value;
+                    sum += values[i];
                 }
                 return sum;
             }

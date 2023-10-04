@@ -138,7 +138,7 @@ namespace Chemistry
 
                 if(denominator == 1) { continue; }
 
-                for(int j = 0; i < solution.Length; j++)
+                for(int j = 0; j < solution.Length; j++)
                 {
                     solution[j] *= denominator;
                 }
