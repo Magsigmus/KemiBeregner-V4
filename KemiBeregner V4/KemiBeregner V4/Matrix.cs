@@ -103,11 +103,11 @@ namespace LinearAlgebra
         /// <summary>
         /// Initializes the matrix using a length in the x- and y-axis
         /// </summary>
-        /// <param name="initXLength">The length in the x-axis</param>
-        /// <param name="initYLength">The length in the y-axis</param>
-        public Matrix(int initXLength, int initYLength)
+        /// <param name="colNum">The length in the x-axis</param>
+        /// <param name="rowNum">The length in the y-axis</param>
+        public Matrix(int colNum, int rowNum)
         {
-            MakeNewMatrix(initXLength, initYLength);
+            MakeNewMatrix(colNum, rowNum);
         }
         #endregion
 
@@ -116,11 +116,11 @@ namespace LinearAlgebra
         /// <summary>
         /// Makes a new matrix and saves it 
         /// </summary>
-        /// <param name="initXLength">The length in the x-axis</param>
-        /// <param name="initYLength">The length in the y-axis</param>
-        private void MakeNewMatrix(int initXLength, int initYLength)
+        /// <param name="colNum">The length in the x-axis</param>
+        /// <param name="rowNum">The length in the y-axis</param>
+        private void MakeNewMatrix(int colNum, int rowNum)
         {
-            T[,] newMatrix = new T[initYLength,initXLength];
+            T[,] newMatrix = new T[rowNum,colNum];
             matrix = newMatrix;
         }
 
@@ -137,9 +137,41 @@ namespace LinearAlgebra
         }
 
         /// <summary>
-        /// Writes the matrix out
+        /// Creates a matrix filled with zeroes
         /// </summary>
-        /// <param name="val">The string the matrix should the written to</param>
+        /// <param name="rowNum">The number of rows in the matrix</param>
+        /// <param name="colNum">The number of columns in the matrix</param>
+        /// <returns>The matrix filled with zeros</returns>
+        public static Matrix<T> CreateZeroMatrix(int rowNum, int colNum)
+        {
+            Matrix<T> matrix = new Matrix<T>(colNum, rowNum);
+            for(int i = 0; i < matrix.ColumnNumber; i++)
+            {
+                for(int j = 0; j < matrix.rowNumber; j++) { matrix[i, j] = T.Zero; }
+            }
+            return matrix;
+        }
+
+        /// <summary>
+        /// Creates a matrix filled with ones
+        /// </summary>
+        /// <param name="rowNum">The number of rows in the matrix</param>
+        /// <param name="colNum">The number of columns in the matrix</param>
+        /// <returns>The matrix filled with ones</returns>
+        public static Matrix<T> CreateOnesMatrix(int rowNum, int colNum)
+        {
+            Matrix<T> matrix = new Matrix<T>(colNum, rowNum);
+            for (int i = 0; i < matrix.ColumnNumber; i++)
+            {
+                for (int j = 0; j < matrix.rowNumber; j++) { matrix[i, j] = T.One; }
+            }
+            return matrix;
+        }
+
+        /// <summary>
+        /// Converts the matrix into a string
+        /// </summary>
+        /// <returns>The matrix as a string</returns>
         public string WriteMatrix()
         {
             string result = "";
@@ -169,10 +201,6 @@ namespace LinearAlgebra
             }
             matrix = result;
         }
-
-        // TODO: ADD ZERO-MATRIX
-
-
 
         /// <summary>
         /// Reduces the matrix to a 1D array
@@ -361,16 +389,18 @@ namespace LinearAlgebra
 
             if (yDir)
             {
-                for(int i = 0; i < inputMatrix.rowNumber; i++)
+                int orgRowNumber = rowNumber;
+                for (int i = 0; i < inputMatrix.rowNumber; i++)
                 {
-                    AddRow(i + rowNumber, inputMatrix.GetRow(i));
+                    AddRow(i + orgRowNumber, inputMatrix.GetRow(i));
                 }
             }
             else
             {
-                for(int i = 0; i < inputMatrix.ColumnNumber; i++)
+                int orgColumnNuber = ColumnNumber;
+                for (int i = 0; i < inputMatrix.ColumnNumber; i++)
                 {
-                    AddColum(i + ColumnNumber, inputMatrix.GetColum(i));
+                    AddColum(i + orgColumnNuber, inputMatrix.GetColum(i));
                 }
             }
         }
@@ -458,23 +488,6 @@ namespace LinearAlgebra
             return algMatrix * (T.One / val);
         }
 
-        public static Matrix<T> operator +(Matrix<T> algMatrix, T val)
-        {
-            for (int i = 0; i < algMatrix.rowNumber; i++)
-            {
-                for (int j = 0; j < algMatrix.ColumnNumber; i++)
-                {
-                    algMatrix.matrix[i, j] += val;
-                }
-            }
-            return algMatrix;
-        }
-
-        public static Matrix<T> operator -(Matrix<T> algMatrix1, T val)
-        {
-            return algMatrix1 + (-val);
-        }
-
         public static Matrix<T> operator +(Matrix<T> algMatrix1, Matrix<T> algMatrix2)
         {
             if(algMatrix1.ColumnNumber != algMatrix2.ColumnNumber || algMatrix1.rowNumber != algMatrix2.rowNumber)
@@ -494,7 +507,12 @@ namespace LinearAlgebra
 
         public static Matrix<T> operator -(Matrix<T> algMatrix1, Matrix<T> algMatrix2)
         {
-            return algMatrix1 + (algMatrix2 * -T.One);
+            return algMatrix1 + (-algMatrix2);
+        }
+
+        public static Matrix<T> operator -(Matrix<T> algMatrix)
+        {
+            return algMatrix * -T.One;
         }
 
         // TODO: ADD MATRIXMULTIPLICATION

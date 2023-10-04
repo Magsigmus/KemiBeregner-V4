@@ -38,12 +38,8 @@ namespace Chemistry
             // Gets the compounds and chemical matrix
             string[] compounds; Matrix<BigRational> chemicalMatrix = MakeChemicalMatrix(input, out compounds);
 
-            MessageBox.Show("Chemical Matrix:\n" + chemicalMatrix.WriteMatrix());
-
             // gets the reduced echelon form
             chemicalMatrix = chemicalMatrix.reducedEchelonForm;
-
-            MessageBox.Show("Reduced Row-Echelon Form:\n" + chemicalMatrix.WriteMatrix());
 
             // Removes every row that contains only zeros
             for (int i = 0; i < chemicalMatrix.rowNumber; i++)
@@ -59,12 +55,16 @@ namespace Chemistry
             // Gets the nullity
             int nullity = chemicalMatrix.nullity;
 
-            if (nullity == 0) { return "Ingen løsning"; }
+            if (nullity <= 0) { return "Ingen løsning"; }
+            if (nullity > 1) { return "Uendelige løsninger"; }
 
             // Modifices the matrix
             Matrix<BigRational> partMatrix1 = new Matrix<BigRational>(chemicalMatrix.ColumnNumber - nullity, nullity);
             partMatrix1.AppendMatrix(Matrix<BigRational>.CreateAnIdentityMatrix(nullity), false);
+
             chemicalMatrix.AppendMatrix(partMatrix1);
+
+            MessageBox.Show(chemicalMatrix.WriteMatrix());
 
             // Gets the inverse of the matrix
             chemicalMatrix = chemicalMatrix.inverse;
