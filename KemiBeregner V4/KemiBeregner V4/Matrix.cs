@@ -24,7 +24,7 @@ namespace LinearAlgebra
         /// <summary>
         /// The length of the matrix in the x-axis
         /// </summary>
-        public int ColumnNumber { get { return matrix.GetLength(1); } }
+        public int columnNumber { get { return matrix.GetLength(1); } }
 
         /// <summary>
         /// The determinant of the matrix
@@ -34,12 +34,12 @@ namespace LinearAlgebra
         /// <summary>
         /// The rank of the matrix
         /// </summary>
-        public int rank { get { return FindRank(this); } }
+        public int rank { get { return FindRankUsingDeterminant(this); } }
 
         /// <summary>
         /// The nullity of this matrix
         /// </summary>
-        public int nullity { get { return ColumnNumber - rank; } }
+        public int nullity { get { return columnNumber - rank; } }
 
         /// <summary>
         /// The inverse of the matrix
@@ -145,7 +145,7 @@ namespace LinearAlgebra
         public static Matrix<T> CreateZeroMatrix(int rowNum, int colNum)
         {
             Matrix<T> matrix = new Matrix<T>(colNum, rowNum);
-            for(int i = 0; i < matrix.ColumnNumber; i++)
+            for(int i = 0; i < matrix.columnNumber; i++)
             {
                 for(int j = 0; j < matrix.rowNumber; j++) { matrix[i, j] = T.Zero; }
             }
@@ -161,7 +161,7 @@ namespace LinearAlgebra
         public static Matrix<T> CreateOnesMatrix(int rowNum, int colNum)
         {
             Matrix<T> matrix = new Matrix<T>(colNum, rowNum);
-            for (int i = 0; i < matrix.ColumnNumber; i++)
+            for (int i = 0; i < matrix.columnNumber; i++)
             {
                 for (int j = 0; j < matrix.rowNumber; j++) { matrix[i, j] = T.One; }
             }
@@ -177,7 +177,7 @@ namespace LinearAlgebra
             string result = "";
             for (int i = 0; i < rowNumber; i++)
             {
-                for (int j = 0; j < ColumnNumber; j++)
+                for (int j = 0; j < columnNumber; j++)
                 {
                     result += $"{matrix[i, j]}\t";
                 }
@@ -191,10 +191,10 @@ namespace LinearAlgebra
         /// </summary>
         public void FlipMatrixAroundIdentity()
         {
-            T[,] result = new T[rowNumber, ColumnNumber];
+            T[,] result = new T[rowNumber, columnNumber];
             for (int i = 0; i < rowNumber; i++)
             {
-                for (int j = 0; j < ColumnNumber; j++)
+                for (int j = 0; j < columnNumber; j++)
                 {
                     result[i, j] = matrix[j, i];
                 }
@@ -208,13 +208,13 @@ namespace LinearAlgebra
         /// <returns>The matrix as an array</returns>
         public T[] ReduceToArray()
         {
-            T[] result = new T[rowNumber * ColumnNumber];
+            T[] result = new T[rowNumber * columnNumber];
 
             for (int i = 0; i < rowNumber; i++)
             {
-                for (int j = 0; j < ColumnNumber; j++)
+                for (int j = 0; j < columnNumber; j++)
                 {
-                    result[i * ColumnNumber + j] = this[j, i];
+                    result[i * columnNumber + j] = this[j, i];
                 }
             }
 
@@ -239,8 +239,8 @@ namespace LinearAlgebra
         /// <returns>A 1(y) by n(x) matrix</returns>
         public Matrix<T> GetRow(int index)
         {
-            Matrix<T> row = new Matrix<T>(ColumnNumber, 1);
-            for(int i = 0;  i < ColumnNumber; i++) { row[i,0] = this[i,index]; }
+            Matrix<T> row = new Matrix<T>(columnNumber, 1);
+            for(int i = 0;  i < columnNumber; i++) { row[i,0] = this[i,index]; }
             return row;
         }
 
@@ -262,11 +262,11 @@ namespace LinearAlgebra
         /// <param name="index">The index of the row that should be removed</param>
         public void RemoveRow(int index)
         {
-            T[,] result = new T[rowNumber - 1, ColumnNumber];
+            T[,] result = new T[rowNumber - 1, columnNumber];
             for (int i = 0; i < rowNumber; i++)
             {
                 if (i == index) { continue; }
-                for (int j = 0; j < ColumnNumber; j++)
+                for (int j = 0; j < columnNumber; j++)
                 {
                     result[i - ((i > index) ? 1 : 0), j] = matrix[i, j];
                 }
@@ -280,10 +280,10 @@ namespace LinearAlgebra
         /// <param name="index">The index of the colum that needs to be removed</param>
         public void RemoveColum(int index)
         {
-            T[,] result = new T[rowNumber, ColumnNumber - 1];
+            T[,] result = new T[rowNumber, columnNumber - 1];
             for (int i = 0; i < rowNumber; i++)
             {
-                for (int j = 0; j < ColumnNumber; j++)
+                for (int j = 0; j < columnNumber; j++)
                 {
                     if (j == index) { continue; }
                     result[i, j - ((j > index) ? 1 : 0)] = matrix[i, j];
@@ -298,10 +298,10 @@ namespace LinearAlgebra
         /// <param name="index">The index where the row needs to be added</param>
         public void AddRow(int index)
         {
-            T[,] result = new T[rowNumber + 1, ColumnNumber];
+            T[,] result = new T[rowNumber + 1, columnNumber];
             for (int i = 0; i < rowNumber; i++)
             {
-                for (int j = 0; j < ColumnNumber; j++)
+                for (int j = 0; j < columnNumber; j++)
                 {
                     result[i + ((i >= index) ? 1 : 0), j] = matrix[i, j];
                 }
@@ -326,10 +326,10 @@ namespace LinearAlgebra
         /// <param name="index">The index where the row needs to be added</param>
         public void AddColum(int index)
         {
-            T[,] result = new T[rowNumber, ColumnNumber + 1];
+            T[,] result = new T[rowNumber, columnNumber + 1];
             for (int i = 0; i < rowNumber; i++)
             {
-                for (int j = 0; j < ColumnNumber; j++)
+                for (int j = 0; j < columnNumber; j++)
                 {
                     result[i, j + ((j >= index) ? 1 : 0)] = matrix[i, j];
                 }
@@ -355,9 +355,9 @@ namespace LinearAlgebra
         /// <param name="row">The row that needs to be inserted</param>
         public void ReplaceRow(int index, Matrix<T> row)
         {
-            if(row.ColumnNumber != ColumnNumber) { throw new Exception("The length of the row needs to be the same as the length of the matrix"); }
+            if(row.columnNumber != columnNumber) { throw new Exception("The length of the row needs to be the same as the length of the matrix"); }
 
-            for(int i = 0; i < ColumnNumber; i++)
+            for(int i = 0; i < columnNumber; i++)
             {
                 matrix[index, i] = row[i,0];
             }
@@ -385,7 +385,7 @@ namespace LinearAlgebra
         /// <param name="yDir">The direction the matrix should be appended in. True is in the y-direction, while false is in the x-direction</param>
         public void AppendMatrix(Matrix<T> inputMatrix, bool yDir = true)
         {
-            if (yDir?(inputMatrix.ColumnNumber != ColumnNumber):(inputMatrix.rowNumber != rowNumber)) { throw new Exception("Non-viable matrix: The matrix must have the same length in the dimention that is not being appended"); }
+            if (yDir?(inputMatrix.columnNumber != columnNumber):(inputMatrix.rowNumber != rowNumber)) { throw new Exception("Non-viable matrix: The matrix must have the same length in the dimention that is not being appended"); }
 
             if (yDir)
             {
@@ -397,8 +397,8 @@ namespace LinearAlgebra
             }
             else
             {
-                int orgColumnNuber = ColumnNumber;
-                for (int i = 0; i < inputMatrix.ColumnNumber; i++)
+                int orgColumnNuber = columnNumber;
+                for (int i = 0; i < inputMatrix.columnNumber; i++)
                 {
                     AddColum(i + orgColumnNuber, inputMatrix.GetColum(i));
                 }
@@ -415,11 +415,11 @@ namespace LinearAlgebra
         /// <returns>A submatrix</returns>
         public Matrix<T> SubMatrix(int subXLength, int subYLength, int xPoint = 0, int yPoint = 0)
         {
-            if(subXLength + xPoint > ColumnNumber || subYLength + yPoint > rowNumber) { throw new Exception("Submatrix exeeds bounds of matrix"); }
+            if(subXLength + xPoint > columnNumber || subYLength + yPoint > rowNumber) { throw new Exception("Submatrix exeeds bounds of matrix"); }
 
             Matrix<T> result = new Matrix<T>(subXLength, subYLength);
 
-            for (int i = 0; xPoint + i < ColumnNumber && i < subXLength; i++)
+            for (int i = 0; xPoint + i < columnNumber && i < subXLength; i++)
             {
                 for (int j = 0; yPoint + j < rowNumber && j < subYLength; j++)
                 {
@@ -439,7 +439,7 @@ namespace LinearAlgebra
         /// <param name="rowIndex">The rowindex of the row</param>
         public void ScaleRow(T scalar, int rowIndex)
         {
-            for (int i = 0; i < ColumnNumber; i++)
+            for (int i = 0; i < columnNumber; i++)
             {
                 matrix[rowIndex, i] *= scalar;
             }
@@ -475,7 +475,7 @@ namespace LinearAlgebra
         {
             for (int i = 0; i < algMatrix.rowNumber; i++)
             {
-                for (int j = 0; j < algMatrix.ColumnNumber; j++)
+                for (int j = 0; j < algMatrix.columnNumber; j++)
                 {
                     algMatrix[j, i] *= val;
                 }
@@ -490,14 +490,14 @@ namespace LinearAlgebra
 
         public static Matrix<T> operator +(Matrix<T> algMatrix1, Matrix<T> algMatrix2)
         {
-            if(algMatrix1.ColumnNumber != algMatrix2.ColumnNumber || algMatrix1.rowNumber != algMatrix2.rowNumber)
+            if(algMatrix1.columnNumber != algMatrix2.columnNumber || algMatrix1.rowNumber != algMatrix2.rowNumber)
             {
                 throw new Exception("Both matricies must have the same length in both dimentions");
             }
 
             for(int i = 0; i < algMatrix1.rowNumber; i++)
             {
-                for(int j = 0; j < algMatrix2.ColumnNumber; j++)
+                for(int j = 0; j < algMatrix2.columnNumber; j++)
                 {
                     algMatrix1[j,i] += algMatrix2[j,i];
                 }
@@ -526,7 +526,7 @@ namespace LinearAlgebra
         /// <returns>The determinat as a double</returns>
         public T FindDeterminant(Matrix<T> input)
         {
-            if (input.ColumnNumber != input.rowNumber) { throw new Exception("Nonviable matrix: The matrix must have the same length in both directions."); }
+            if (input.columnNumber != input.rowNumber) { throw new Exception("Nonviable matrix: The matrix must have the same length in both directions."); }
             T determinant = T.Zero;
             int length = input.rowNumber;
             if (length == 1) { return input[0, 0]; }
@@ -555,11 +555,9 @@ namespace LinearAlgebra
         /// </summary>
         /// <param name="input">The matrix</param>
         /// <returns>The rank of that matrix, -1 if none can be found</returns>
-        public int FindRank(Matrix<T> input)
+        public int FindRankUsingDeterminant(Matrix<T> input)
         {
-            // TODO: REDEFINE USING OTHER ALGORITM, MAYBE GAUSS-JORDAN
-
-            int rank = Math.Min(input.ColumnNumber, input.rowNumber);
+            int rank = Math.Min(input.columnNumber, input.rowNumber);
             T determinant = T.Zero;
             bool breakout = true;
             while (breakout)
@@ -571,7 +569,7 @@ namespace LinearAlgebra
 
                 for (int i = 0; i < input.rowNumber - rank + 1; i++)
                 {
-                    for (int j = 0; j < input.ColumnNumber - rank + 1; j++)
+                    for (int j = 0; j < input.columnNumber - rank + 1; j++)
                     {
                         Matrix<T> temp = input.SubMatrix(rank, rank, j, i);
                         determinant = temp.determinant;
@@ -596,11 +594,11 @@ namespace LinearAlgebra
         public Matrix<T> FindInverse(Matrix<T> matrix)
         {
             T determiant = FindDeterminant(matrix);
-            Matrix<T> inverse = new Matrix<T>(matrix.rowNumber, matrix.ColumnNumber);
+            Matrix<T> inverse = new Matrix<T>(matrix.rowNumber, matrix.columnNumber);
 
             for (int i = 0; i < matrix.rowNumber; i++)
             {
-                for (int j = 0; j < matrix.ColumnNumber; j++)
+                for (int j = 0; j < matrix.columnNumber; j++)
                 {
                     Matrix<T> tempMatrix = (Matrix<T>)matrix.Clone();
                     tempMatrix.RemoveRow(i); tempMatrix.RemoveColum(j);
@@ -623,23 +621,25 @@ namespace LinearAlgebra
         {
             int rowsCompleted = 0;
             int columnsCompleted = 0;
-            while(rowsCompleted != input.rowNumber && columnsCompleted != input.ColumnNumber)
+            while(rowsCompleted != input.rowNumber && columnsCompleted != input.columnNumber)
             {
-
-                while (GenericSum(input.GetColum(columnsCompleted).ReduceToArray()) == T.Zero)
+                // Skips all columns not containing a pivot
+                if (GenericSum(input.GetColum(columnsCompleted).ReduceToArray()) == T.Zero)
                 {
                     columnsCompleted++;
+                    continue;
                 }
 
+                // Finds the entry with the largest absolute value 
                 int index = MaxAbsValIndex(input.GetColum(columnsCompleted).ReduceToArray());
 
-                if (index != rowsCompleted)
-                {
-                    input.SwapRows(index, rowsCompleted);
-                }
+                // Moves the row containing the largest absolute value to the top (type 1 elementary operation)
+                if (index != rowsCompleted) { input.SwapRows(index, rowsCompleted); }
 
+                // Scales the row so the aforementioned value becomes 1 (type 2 elementary operation)
                 input.ScaleRow(T.One / input[columnsCompleted, rowsCompleted], rowsCompleted);
 
+                // Makes sure the other entries in the column is reduced to 0
                 for (int i = 0; i < input.rowNumber; i++)
                 {
                     if (i == rowsCompleted) { continue; }
@@ -652,6 +652,7 @@ namespace LinearAlgebra
 
             return input;
 
+            // Finds the index containing the maximium absolute entry
             int MaxAbsValIndex(T[] values)
             {
                 T max = -T.One;
@@ -663,6 +664,7 @@ namespace LinearAlgebra
                 return maxIndex;
             } 
 
+            // Finds the sum of entries under the finished rows
             T GenericSum(T[] values) 
             {
                 T sum = T.Zero;

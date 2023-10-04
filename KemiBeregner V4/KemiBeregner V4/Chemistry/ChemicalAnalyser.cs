@@ -45,7 +45,7 @@ namespace Chemistry
             for (int i = 0; i < chemicalMatrix.rowNumber; i++)
             {
                 bool allZeros = true;
-                for (int j = 0; j < chemicalMatrix.ColumnNumber; j++)
+                for (int j = 0; j < chemicalMatrix.columnNumber; j++)
                 {
                     if (chemicalMatrix[j, i] != 0) { allZeros = false; break; }
                 }
@@ -53,33 +53,24 @@ namespace Chemistry
             }
 
             // Gets the nullity
-            int nullity = chemicalMatrix.nullity;
+            int nullity = chemicalMatrix.columnNumber - chemicalMatrix.rowNumber;
 
             if (nullity <= 0) { return "Ingen løsning"; }
             if (nullity > 1) { return "Uendelige løsninger"; }
 
             // Modifices the matrix
-            Matrix<BigRational> partMatrix1 = new Matrix<BigRational>(chemicalMatrix.ColumnNumber - nullity, nullity);
+            Matrix<BigRational> partMatrix1 = new Matrix<BigRational>(chemicalMatrix.columnNumber - nullity, nullity);
             partMatrix1.AppendMatrix(Matrix<BigRational>.CreateAnIdentityMatrix(nullity), false);
-
             chemicalMatrix.AppendMatrix(partMatrix1);
-
-            MessageBox.Show(chemicalMatrix.WriteMatrix());
 
             // Gets the inverse of the matrix
             chemicalMatrix = chemicalMatrix.inverse;
 
             // Gets the raw solution
-            BigRational[] rawSolution = chemicalMatrix.GetColum(chemicalMatrix.ColumnNumber - 1).ReduceToArray();
+            BigRational[] rawSolution = chemicalMatrix.GetColum(chemicalMatrix.columnNumber - 1).ReduceToArray();
 
             // Converts that to ints
             int[] solution = RawSolutionToInt(rawSolution);
-
-
-            //Array.Sort(solution, compounds, IComparer<int>.)
-
-            //Array.Sort(solution, compounds);
-            //Array.Reverse(solution); Array.Reverse(compounds);
 
             return FormatSolution(solution, compounds);
         }
