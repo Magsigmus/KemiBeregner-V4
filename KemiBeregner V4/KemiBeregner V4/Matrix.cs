@@ -649,15 +649,17 @@ namespace LinearAlgebra
                 }
 
                 // Scales the row so the aforementioned value becomes 1 (type 2 elementary operation)
-                input.ScaleRow(T.One / input[columnsCompleted, rowsCompleted], rowsCompleted);
-                inverse.ScaleRow(T.One / input[columnsCompleted, rowsCompleted], rowsCompleted);
+                T tempValue = input[columnsCompleted, rowsCompleted];
+                input.ScaleRow(T.One / tempValue, rowsCompleted);
+                inverse.ScaleRow(T.One / tempValue, rowsCompleted);
 
                 // Makes sure the other entries in the column is reduced to 0
                 for (int i = 0; i < input.rowNumber; i++)
                 {
                     if (i == rowsCompleted) { continue; }
-                    input.ScaleAndAddRow(-input[columnsCompleted, i], rowsCompleted, i);
-                    inverse.ScaleAndAddRow(-input[columnsCompleted, i], rowsCompleted, i);
+                    T tempValue2 = -input[columnsCompleted, i];
+                    input.ScaleAndAddRow(tempValue2, rowsCompleted, i);
+                    inverse.ScaleAndAddRow(tempValue2, rowsCompleted, i);
                 }
 
                 rowsCompleted++;
