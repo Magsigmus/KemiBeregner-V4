@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Numerics.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace LinearAlgebra
@@ -42,9 +43,14 @@ namespace LinearAlgebra
         public int nullity { get { return columnNumber - rank; } }
 
         /// <summary>
-        /// The inverse of the matrix
+        /// Checks if this matrix is invertable
         /// </summary>
-        public Matrix<T> inverse { get { return FindInverse(this); } }
+        public bool isInvertable { get { return determinant != T.Zero; } }
+
+        /// <summary>
+        /// The inverse of the matrix, returns null if the matrix is non-invertable
+        /// </summary>
+        public Matrix<T>? inverse { get { return isInvertable ? FindInverseUsingGauss(this) : null; } }
 
         /// <summary>
         /// The reduced echelon form of the matrix
@@ -524,7 +530,7 @@ namespace LinearAlgebra
         /// </summary>
         /// <param name="input">The matrix</param>
         /// <returns>The determinat as a double</returns>
-        public T FindDeterminant(Matrix<T> input)
+        public static T FindDeterminant(Matrix<T> input)
         {
             if (input.columnNumber != input.rowNumber) { throw new Exception("Nonviable matrix: The matrix must have the same length in both directions."); }
             T determinant = T.Zero;
@@ -555,7 +561,7 @@ namespace LinearAlgebra
         /// </summary>
         /// <param name="input">The matrix</param>
         /// <returns>The rank of that matrix, -1 if none can be found</returns>
-        public int FindRankUsingDeterminant(Matrix<T> input)
+        public static int FindRankUsingDeterminant(Matrix<T> input)
         {
             int rank = Math.Min(input.columnNumber, input.rowNumber);
             T determinant = T.Zero;
@@ -587,11 +593,11 @@ namespace LinearAlgebra
         }
 
         /// <summary>
-        /// Finds the inverse of a matrix
+        /// Finds the inverse of a matrix using it's determinant (assumes the matrix is invertable)
         /// </summary>
         /// <param name="matrix">The matrix</param>
         /// <returns>The inverse of the matrix as a matrix</returns>
-        public Matrix<T> FindInverse(Matrix<T> matrix)
+        public static Matrix<T> FindInverse(Matrix<T> matrix)
         {
             T determiant = FindDeterminant(matrix);
             Matrix<T> inverse = new Matrix<T>(matrix.rowNumber, matrix.columnNumber);
@@ -610,6 +616,78 @@ namespace LinearAlgebra
             inverse /= determiant;
 
             return inverse;
+        }
+
+        /// <summary>
+        /// Finds the inverse of a matrix using Gauss-Jordan elimination (assumes the matrix is invertable)
+        /// </summary>
+        /// <param name="input">The matrix that should be inverted</param>
+        /// <returns>The inverse of the input matrix</returns>
+        public static Matrix<T> FindInverseUsingGauss(Matrix<T> input)
+        {
+            Matrix<T> inverse = CreateAnIdentityMatrix(input.rowNumber);
+
+            int rowsCompleted = 0;
+            int columnsCompleted = 0;
+            while (rowsCompleted != input.rowNumber && columnsCompleted != input.columnNumber)
+            {
+                // Skips all columns not containing a pivot
+                if (GenericSum(input.GetColum(columnsCompleted).ReduceToArray()) == T.Zero)
+                {
+                    columnsCompleted++;
+                    continue;
+                }
+
+                // Finds the entry with the largest absolute value 
+                int index = MaxAbsValIndex(input.GetColum(columnsCompleted).ReduceToArray());
+
+                // Moves the row containing the largest absolute value to the top (type 1 elementary operation)
+                if (index != rowsCompleted) 
+                { 
+                    input.SwapRows(index, rowsCompleted); 
+                    inverse.SwapRows(index, rowsCompleted); 
+                }
+
+                // Scales the row so the aforementioned value becomes 1 (type 2 elementary operation)
+                input.ScaleRow(T.One / input[columnsCompleted, rowsCompleted], rowsCompleted);
+                inverse.ScaleRow(T.One / input[columnsCompleted, rowsCompleted], rowsCompleted);
+
+                // Makes sure the other entries in the column is reduced to 0
+                for (int i = 0; i < input.rowNumber; i++)
+                {
+                    if (i == rowsCompleted) { continue; }
+                    input.ScaleAndAddRow(-input[columnsCompleted, i], rowsCompleted, i);
+                    inverse.ScaleAndAddRow(-input[columnsCompleted, i], rowsCompleted, i);
+                }
+
+                rowsCompleted++;
+                columnsCompleted++;
+            }
+
+            return input;
+
+            // Finds the index containing the maximium absolute entry
+            int MaxAbsValIndex(T[] values)
+            {
+                T max = -T.One;
+                int maxIndex = -1;
+                for (int i = rowsCompleted; i < values.Length; i++)
+                {
+                    if (max < T.Abs(values[i])) { max = T.Abs(values[i]); maxIndex = i; }
+                }
+                return maxIndex;
+            }
+
+            // Finds the sum of entries under the finished rows
+            T GenericSum(T[] values)
+            {
+                T sum = T.Zero;
+                for (int i = rowsCompleted; i < values.Length; i++)
+                {
+                    sum += values[i];
+                }
+                return sum;
+            }
         }
 
         /// <summary>
@@ -634,7 +712,10 @@ namespace LinearAlgebra
                 int index = MaxAbsValIndex(input.GetColum(columnsCompleted).ReduceToArray());
 
                 // Moves the row containing the largest absolute value to the top (type 1 elementary operation)
-                if (index != rowsCompleted) { input.SwapRows(index, rowsCompleted); }
+                if (index != rowsCompleted) 
+                { 
+                    input.SwapRows(index, rowsCompleted);
+                }
 
                 // Scales the row so the aforementioned value becomes 1 (type 2 elementary operation)
                 input.ScaleRow(T.One / input[columnsCompleted, rowsCompleted], rowsCompleted);

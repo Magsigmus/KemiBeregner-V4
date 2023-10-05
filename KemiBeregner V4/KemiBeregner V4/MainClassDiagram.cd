@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="KemiBeregner_V2.Program">
+    <Position X="1.25" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LinearAlgebra.Matrix&lt;T&gt;">
+    <Position X="3.5" Y="1" Width="3.75" />
+    <AssociationLine Name="inverse" Type="LinearAlgebra.Matrix&lt;T&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3.5" Y="2.829" />
+        <Point X="3.25" Y="2.829" />
+        <Point X="3.25" Y="3.416" />
+        <Point X="3.5" Y="3.416" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="reducedEchelonForm" Type="LinearAlgebra.Matrix&lt;T&gt;">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.171" Y="0.279" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>oAAASAAAwYAqAwwIagUAAKAAIgAIAAASkAAIAAAABzA=</HashCode>
+      <FileName>Matrix.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="inverse" />
+      <Property Name="reducedEchelonForm" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Chemistry.ChemicalAnalyser">
+    <Position X="8.75" Y="1" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="Chemistry.ChemicalAnalyser.ChemicalCompound" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Chemistry\ChemicalAnalyser.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAABAgYCAQAgIAAAAAAAAAAAAEAgAIAA=</HashCode>
+      <FileName>Chemistry\ChemicalAnalyser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
