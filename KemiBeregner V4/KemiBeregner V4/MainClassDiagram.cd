@@ -33,7 +33,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Chemistry.ChemicalAnalyser">
-    <Position X="8.75" Y="1" Width="1.5" />
+    <Position X="7.5" Y="1" Width="2.75" />
     <NestedTypes>
       <Struct Name="Chemistry.ChemicalAnalyser.ChemicalCompound" Collapsed="true">
         <TypeIdentifier>

@@ -56,7 +56,7 @@ namespace Chemistry
             int nullity = chemicalMatrix.columnNumber - chemicalMatrix.rowNumber;
 
             if (nullity <= 0) { return "Ingen løsning"; }
-            if (nullity > 1) { return "Uendelige løsninger"; }
+            //if (nullity > 1) { return "Uendelige løsninger"; }
 
             // Modifices the matrix
             Matrix<BigRational> partMatrix1 = new Matrix<BigRational>(chemicalMatrix.columnNumber - nullity, nullity);
@@ -66,13 +66,17 @@ namespace Chemistry
             // Gets the inverse of the matrix
             chemicalMatrix = chemicalMatrix.inverse;
 
-            // Gets the raw solution
-            BigRational[] rawSolution = chemicalMatrix.GetColum(chemicalMatrix.columnNumber - 1).ReduceToArray();
+            string solution = "";
+            for(int i = 1; i <= nullity; i++)
+            {
+                // Gets the raw solution
+                BigRational[] rawSolution = chemicalMatrix.GetColum(chemicalMatrix.columnNumber - i).ReduceToArray();
 
-            // Converts that to ints
-            int[] solution = RawSolutionToInt(rawSolution);
+                solution += FormatSolution(RawSolutionToInt(rawSolution), compounds);
+                if(i != nullity) { solution += " // "; }
+            }
 
-            return FormatSolution(solution, compounds);
+            return solution;
         }
 
         /// <summary>
@@ -83,7 +87,9 @@ namespace Chemistry
         /// <returns>The chemical matrix as a linear algebra matrix</returns>
         public static Matrix<BigRational> MakeChemicalMatrix(string input, out string[] compounds)
         {
-            // Gets all the chemical compounds and elements in the reaktionsskema
+            //int reactantNum = input.Split('→')[0].Split('+').Length;
+
+            // Gets all the chemical compounds and elements in the chemical 
             compounds = GetAllCompoundsInEquation(input);
             string[] elements = FindAllElements(input);
             ChemicalCompound[] compundInfos = compounds.Select(e => ParseChemcialCompound(e)).ToArray();
@@ -99,7 +105,7 @@ namespace Chemistry
                 {
                     int index = 0;
                     for (; compundElements.elements[j] != elements[index] && index < elements.Length; index++) ;
-                    chemicalMatrix[i, index] = compundElements.coefficents[j];
+                    chemicalMatrix[i, index] = compundElements.coefficents[j];  //((i >= reactantNum)?-1:1) *
                 }
 
                 // Adds the charge to the chemical matrix
@@ -152,27 +158,31 @@ namespace Chemistry
 
         private static string FormatSolution(int[] solution, string[] compounds)
         {
-            string writtenSolution = "";
+            List<string> reacants = new List<string>(); 
+            List<string> products = new List<string>(); 
+            int sign = Math.Sign(solution.Where(e=> e!=0).ToArray()[0]); // The sign of the first non-zero value
 
             // Goes through every coefficent
-            for (int i = 0; i < solution.Length - 1; i++)
+            for (int i = 0; i < solution.Length; i++)
             {
+                // If the compound doesn't exist in the chemical equation, then skip it
+                if(solution[i] == 0) { continue; }
+
                 // If the coefficent is 1, then do not write it
                 string coefficent = ((Math.Abs(solution[i]) != 1) ? Math.Abs(solution[i]).ToString() : "");
 
                 // Add the coefficent and compound
-                writtenSolution += $"{coefficent}{compounds[i]} ";
-                
-                // Adds the connecting symbol 
-                if (solution[i] > 0 != solution[i + 1] > 0) { writtenSolution += "→ "; }
-                else { writtenSolution += "+ "; }
+                if (Math.Sign(solution[i]) == sign)
+                {
+                    reacants.Add($"{coefficent}{compounds[i]}");
+                }
+                else
+                {
+                    products.Add($"{coefficent}{compounds[i]}");
+                }
             }
 
-            // Adds the last coefficent and compound
-            string lastCoefficent = ((Math.Abs(solution[solution.Length - 1]) != 1) ? Math.Abs(solution[solution.Length - 1]).ToString() : "");
-            writtenSolution += $"{lastCoefficent}{compounds[solution.Length - 1]}";
-
-            return writtenSolution;
+            return string.Join(" + ", reacants) + " → " + string.Join(" + ", products);
         }
 
         /// <summary>

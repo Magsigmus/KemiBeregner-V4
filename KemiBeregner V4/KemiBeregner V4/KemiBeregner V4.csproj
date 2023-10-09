@@ -10,6 +10,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="bin\Debug\net7.0-windows\KemiBeregner V4.deps.json" />
+    <Content Include="bin\Debug\net7.0-windows\KemiBeregner V4.runtimeconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\net7.0-windows\KemiBeregner V4.dll" />
+    <None Include="bin\Debug\net7.0-windows\KemiBeregner V4.exe" />
+    <None Include="bin\Debug\net7.0-windows\KemiBeregner V4.pdb" />
+    <None Include="bin\Debug\net7.0-windows\PeriodicTable.txt" />
+    <None Include="bin\Debug\net7.0-windows\System.Numerics.Rational.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BigRational" Version="1.0.0.7" />
   </ItemGroup>
 

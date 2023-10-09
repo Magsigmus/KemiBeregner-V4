@@ -666,7 +666,7 @@ namespace LinearAlgebra
                 columnsCompleted++;
             }
 
-            return input;
+            return inverse;
 
             // Finds the index containing the maximium absolute entry
             int MaxAbsValIndex(T[] values)

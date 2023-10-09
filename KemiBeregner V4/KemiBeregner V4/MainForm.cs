@@ -120,12 +120,19 @@ namespace KemiBeregner_V2
         // Gets called just before a charactor is entered in a textbox
         private void inputTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter) { e.Handled = true; OutputTextBox.Text = ChemicalAnalyser.BalenceChemicalEqation(inputTextBox.Text); }
+            if (e.KeyCode == Keys.Enter) { e.Handled = true; OutputTextBox.Text = FindSolution(inputTextBox.Text); }
         }
 
         void CalculateButton_Click(object sender, EventArgs e)
         {
-            OutputTextBox.Text = ChemicalAnalyser.BalenceChemicalEqation(inputTextBox.Text);
+            OutputTextBox.Text = FindSolution(inputTextBox.Text);
+        }
+
+        string FindSolution(string input)
+        {
+            string solution = ChemicalAnalyser.BalenceChemicalEqation(input);
+            if(solution.Contains("//")) { MessageBox.Show("Reaktionsskemaet har en uendelig mængde af løsninger. \nKombiner følgende reaktionsskemaer for at finde det afstemte reaktionsskema"); }
+            return solution;
         }
 
         // Gets called when the table button is pressed
