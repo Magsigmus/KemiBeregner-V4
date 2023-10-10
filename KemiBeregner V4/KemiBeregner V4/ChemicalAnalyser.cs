@@ -8,8 +8,6 @@ namespace Chemistry
 {
     class ChemicalAnalyser
     {
-        private static PeriodicTable table = new PeriodicTable();
-
         public struct ChemicalCompound
         {
             public List<string> elements;
