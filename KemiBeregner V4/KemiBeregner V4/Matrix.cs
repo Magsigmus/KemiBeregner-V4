@@ -632,14 +632,14 @@ namespace LinearAlgebra
             while (rowsCompleted != input.rowNumber && columnsCompleted != input.columnNumber)
             {
                 // Skips all columns not containing a pivot
-                if (GenericSum(input.GetColum(columnsCompleted).ReduceToArray()) == T.Zero)
+                if (IsAllZero(input.GetColum(columnsCompleted).ReduceToArray(), rowsCompleted))
                 {
                     columnsCompleted++;
                     continue;
                 }
 
                 // Finds the entry with the largest absolute value 
-                int index = MaxAbsValIndex(input.GetColum(columnsCompleted).ReduceToArray());
+                int index = MaxAbsValIndex(input.GetColum(columnsCompleted).ReduceToArray(), rowsCompleted);
 
                 // Moves the row containing the largest absolute value to the top (type 1 elementary operation)
                 if (index != rowsCompleted) 
@@ -667,29 +667,6 @@ namespace LinearAlgebra
             }
 
             return inverse;
-
-            // Finds the index containing the maximium absolute entry
-            int MaxAbsValIndex(T[] values)
-            {
-                T max = -T.One;
-                int maxIndex = -1;
-                for (int i = rowsCompleted; i < values.Length; i++)
-                {
-                    if (max < T.Abs(values[i])) { max = T.Abs(values[i]); maxIndex = i; }
-                }
-                return maxIndex;
-            }
-
-            // Finds the sum of entries under the finished rows
-            T GenericSum(T[] values)
-            {
-                T sum = T.Zero;
-                for (int i = rowsCompleted; i < values.Length; i++)
-                {
-                    sum += values[i];
-                }
-                return sum;
-            }
         }
 
         /// <summary>
@@ -704,14 +681,14 @@ namespace LinearAlgebra
             while(rowsCompleted != input.rowNumber && columnsCompleted != input.columnNumber)
             {
                 // Skips all columns not containing a pivot
-                if (GenericSum(input.GetColum(columnsCompleted).ReduceToArray()) == T.Zero)
+                if (IsAllZero(input.GetColum(columnsCompleted).ReduceToArray(), rowsCompleted))
                 {
                     columnsCompleted++;
                     continue;
                 }
 
                 // Finds the entry with the largest absolute value 
-                int index = MaxAbsValIndex(input.GetColum(columnsCompleted).ReduceToArray());
+                int index = MaxAbsValIndex(input.GetColum(columnsCompleted).ReduceToArray(), rowsCompleted);
 
                 // Moves the row containing the largest absolute value to the top (type 1 elementary operation)
                 if (index != rowsCompleted) 
@@ -734,29 +711,29 @@ namespace LinearAlgebra
             }
 
             return input;
+        }
 
-            // Finds the index containing the maximium absolute entry
-            int MaxAbsValIndex(T[] values)
-            {
-                T max = -T.One;
-                int maxIndex = -1;
-                for(int i = rowsCompleted; i < values.Length; i++)
-                {
-                    if(max < T.Abs(values[i])) { max = T.Abs(values[i]); maxIndex = i; }
-                }
-                return maxIndex;
-            } 
 
-            // Finds the sum of entries under the finished rows
-            T GenericSum(T[] values) 
+        // Finds the index containing the maximium absolute entry
+        static int MaxAbsValIndex(T[] values, int startIndex)
+        {
+            T max = -T.One;
+            int maxIndex = -1;
+            for (; startIndex < values.Length; startIndex++)
             {
-                T sum = T.Zero;
-                for(int i = rowsCompleted; i < values.Length; i++)
-                {
-                    sum += values[i];
-                }
-                return sum;
+                if (max < T.Abs(values[startIndex])) { max = T.Abs(values[startIndex]); maxIndex = startIndex; }
             }
+            return maxIndex;
+        }
+
+        // Finds the sum of entries under the finished rows
+        static bool IsAllZero(T[] values, int startindex)
+        {
+            for (; startindex < values.Length; startindex++)
+            {
+                if (values[startindex] != T.Zero) { return false; }
+            }
+            return true;
         }
 
         #endregion

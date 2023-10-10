@@ -392,23 +392,6 @@ namespace Chemistry
             }
         }
 
-        /// <summary>
-        /// Gets the molarmass of a compound
-        /// </summary>
-        /// <param name="compound">The compound as a string</param>
-        /// <returns>The molar mass</returns>
-        public static double GetMolarMass(string compound)
-        {
-            ChemicalCompound info = ParseChemcialCompound(compound);
-            double[] molarmasses = info.elements.Select(e => table.molarmasses[table.IndexOfElemet(e)]).ToArray();
-            double sum = 0;
-            for(int i = 0; i < info.elements.Count; i++)
-            {
-                sum += molarmasses[i] * (double)info.coefficents[i];
-            }
-            return sum;
-        }
-
         static bool IsSuperscript(char input)
         {
             return "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻".Contains(input);
