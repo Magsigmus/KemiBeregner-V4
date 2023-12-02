@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Chemistry;
+using System;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Numerics;
 using System.Numerics.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -712,7 +714,6 @@ namespace LinearAlgebra
 
             return input;
         }
-
 
         // Finds the index containing the maximium absolute entry
         static int MaxAbsValIndex(T[] values, int startIndex)

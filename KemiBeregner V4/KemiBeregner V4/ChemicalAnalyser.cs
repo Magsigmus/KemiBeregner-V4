@@ -85,8 +85,6 @@ namespace Chemistry
         /// <returns>The chemical matrix as a linear algebra matrix</returns>
         public static Matrix<BigRational> MakeChemicalMatrix(string input, out string[] compounds)
         {
-            //int reactantNum = input.Split('→')[0].Split('+').Length;
-
             // Gets all the chemical compounds and elements in the chemical 
             compounds = GetAllCompoundsInEquation(input);
             string[] elements = FindAllElements(input);
@@ -125,31 +123,11 @@ namespace Chemistry
 
         private static int[] RawSolutionToInt(BigRational[] solution)
         {
-            // Converts the rationals to integeres, while preserving the ratio between the coefficents
-            for(int i = 0; i < solution.Length; i++) 
-            {
-                BigRational.Integer denominator;
-                BigRational.NumDen(solution[i], out denominator);
-
-                if(denominator == 1) { continue; }
-
-                for(int j = 0; j < solution.Length; j++)
-                {
-                    solution[j] *= denominator;
-                }
-            }
-
-            // Makes the coefficents co-prime
-            int gcd = 1;
-            do
-            {
-                // Finds the greatest common divisor
-                gcd = GCD((int)solution[0], (int)solution[1]);
-                for (int i = 2; i < solution.Length; i++) { gcd = GCD((int)solution[i], gcd); }
-
-                // Divies with the greatest common divisor
-                solution = solution.Select(element => element / gcd).ToArray();
-            } while (gcd != 1);
+            // Turns the solution into coprime whole numbers
+            BigRational lcm = LCM(solution.Select(e => (BigInteger)BigRational.NumDen(e).Denumerator).ToArray()),
+                        gcd = GCD(solution.Select(e => (BigInteger)BigRational.NumDen(e).Numerator).ToArray());
+            BigRational k = lcm / gcd;
+            solution = solution.Select(e => e * k).ToArray();
 
             return solution.Select(e => (int)e).ToArray();
         }
@@ -402,10 +380,39 @@ namespace Chemistry
             return "₀₁₂₃₄₅₆₇₈₉".Contains(input);
         }
 
-        private static int GCD(int a, int b)
+        private static BigInteger GCD(BigInteger[] nums)
+        {
+            BigInteger gcd = nums[0];
+            for (int i = 1; i < nums.Length; i++) { gcd = GCD(gcd, nums[i]); }
+            return gcd;
+        }
+
+        private static BigInteger GCD(BigInteger a, BigInteger b)
         {
             if (b == 0) return a;
             return GCD(b, a % b);
+        }
+
+        private static BigInteger LCM(BigInteger[] nums)
+        {
+            BigInteger lcm = nums[0];
+            for(int i = 1; i < nums.Length; i++) { lcm = LCM(lcm, nums[i]); }
+            return lcm;
+
+            static BigInteger LCM(BigInteger a, BigInteger b)
+            {
+                return BigInteger.Abs(a * b / GCD(a, b));
+            }
+        }
+
+        public static string WriteBigRationalMatrixAsFractions(Matrix<BigRational> matrix)
+        {
+            string result = "";
+            for(int i = 0; i < matrix.rowNumber; i++)
+            {
+                result += string.Join(", ", matrix.GetRow(i).ReduceToArray().Select(BigRational.NumDen).Select(e => e.Numerator.ToString() + ((e.Denumerator.IsOne)?"": "/" + e.Denumerator.ToString()))) + "\n";
+            }
+            return result;
         }
     }
 }
