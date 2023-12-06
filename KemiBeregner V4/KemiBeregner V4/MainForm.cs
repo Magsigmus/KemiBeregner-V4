@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
@@ -119,6 +120,18 @@ namespace KemiBeregner_V2
 
         string FindSolution(string input)
         {
+            /* Is used to figure out how long the algoritmn takes to calculate the answer
+            long sum = 0;
+
+            for(int i = 0; i < 1000; i++)
+            {
+                Stopwatch sw = Stopwatch.StartNew();
+                ChemicalAnalyser.BalenceChemicalEqation(input);
+                sum += sw.ElapsedMilliseconds;
+            }
+
+            MessageBox.Show($"Gennemsnitlig tid for at afstemme reaktionsskemaet: {sum / 1000} ms");*/
+
             string solution = ChemicalAnalyser.BalenceChemicalEqation(input);
             if (solution.Contains("//")) { MessageBox.Show("Reaktionsskemaet har en uendelig mængde af løsninger. \nKombiner følgende reaktionsskemaer for at finde det afstemte reaktionsskema."); }
             return solution;

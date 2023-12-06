@@ -57,9 +57,9 @@ namespace Chemistry
             //if (nullity > 1) { return "Uendelige løsninger"; }
 
             // Modifices the matrix
-            Matrix<BigRational> partMatrix1 = new Matrix<BigRational>(chemicalMatrix.columnNumber - nullity, nullity);
-            partMatrix1.AppendMatrix(Matrix<BigRational>.CreateAnIdentityMatrix(nullity), false);
-            chemicalMatrix.AppendMatrix(partMatrix1);
+            Matrix<BigRational> partMatrix = new Matrix<BigRational>(chemicalMatrix.columnNumber - nullity, nullity);
+            partMatrix.AppendMatrix(Matrix<BigRational>.CreateAnIdentityMatrix(nullity), false);
+            chemicalMatrix.AppendMatrix(partMatrix);
 
             // Gets the inverse of the matrix
             chemicalMatrix = chemicalMatrix.inverse;
@@ -175,7 +175,7 @@ namespace Chemistry
             // Goes though every charactor of the input
             for (int i = 1; i < input.Length; i++)
             {
-                if (char.IsUpper(input[i])) // If the charactor is capitalized then it must be start of a new element
+                if (char.IsUpper(input[i])) // If the character is capitalized then it must be start of a new element
                 {
                     // Adds the element to the result if it is not added already
                     if (result.IndexOf(proposal) == -1) { result.Add(proposal); } 
@@ -246,7 +246,7 @@ namespace Chemistry
 
                     UpdateResult(element, elementCoefficent);
                 }
-                // If there is a start of a subcompound parse it (subcompounds are denoted with "(SUBCOMPOUND)" like Mg(OH)2)
+                // If there is a start of a subcompound parse it (subcompounds are denoted with "(SUBCOMPOUND)" like Mg(OH)2
                 else if (input[i] == '(')
                 {
                     // Find the index of the end of the paraentese - the index of ')'
@@ -294,7 +294,7 @@ namespace Chemistry
                     if (i == input.Length - 1) { i++; break; }
                 }
 
-                // Converts it to a double
+                // Converts it to a int
                 return Convert.ToInt32(rawNum);
             }
 
