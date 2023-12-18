@@ -58,7 +58,7 @@ namespace Chemistry
 
             // Modifices the matrix
             Matrix<BigRational> partMatrix = new Matrix<BigRational>(chemicalMatrix.columnNumber - nullity, nullity);
-            partMatrix.AppendMatrix(Matrix<BigRational>.CreateAnIdentityMatrix(nullity), false);
+            partMatrix.AppendMatrix(Matrix<BigRational>.CreateAnIdentityMatrix(nullity), false); // MAYBE - HERE? AVOIDS INVERSE CALCULATION
             chemicalMatrix.AppendMatrix(partMatrix);
 
             // Gets the inverse of the matrix
